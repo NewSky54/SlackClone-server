@@ -13,9 +13,11 @@ export default {
       // args: The arguments provided to the field in the GraphQL query.
       // context: A value which is provided to every resolver and holds important contextual information like the currently logged in user, or access to a DB.
       try {
-        await models.Team.create({ ...args, owner: user.id });
+        const team = await models.Team.create({ ...args, owner: user.id });
+        await models.Channel.create({ name: "general", public: true, teamId: team.id });
         return {
-          ok: true
+          ok: true,
+          team
         };
       } catch (err) {
         return {
@@ -26,6 +28,6 @@ export default {
     })
   },
   Team: {
-    channels: ({ id }, args, { models }) => models.Channel.findAll({ teamId: id })
+    channels: ({ id }, args, { models }) => models.Channel.findAll({ where: { teamId: id } })
   }
 };
