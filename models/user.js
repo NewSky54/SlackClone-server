@@ -1,0 +1,73 @@
+import bcrypt from "bcrypt";
+const saltRounds = 12;
+
+export default (sequelize, DataTypes) => {
+  const User = sequelize.define(
+    "user",
+    {
+      username: {
+        type: DataTypes.STRING,
+        unique: true,
+        validate: {
+          isAlphanumeric: {
+            args: true,
+            msg: "Username can only contain letters and numbers"
+          },
+          len: {
+            args: [3, 25],
+            msg: "Username must be 3 to 25 characters long"
+          }
+        }
+      },
+      email: {
+        type: DataTypes.STRING,
+        unique: true,
+        validate: {
+          isEmail: {
+            args: true,
+            msg: "Invalid Email"
+          }
+        }
+      },
+      password: {
+        type: DataTypes.STRING,
+        // Password Validation
+        validate: {
+          len: {
+            args: [5, 100],
+            msg: "The password needs to be between 5 and 100 characters long"
+          }
+        }
+      }
+    },
+    {
+      hooks: {
+        afterValidate: async user => {
+          // Encrypt password then store in db
+          const hashedPassword = await bcrypt.hash(user.password, saltRounds);
+          user.password = hashedPassword;
+        }
+      }
+    }
+  );
+
+  User.associate = models => {
+    User.belongsToMany(models.Team, {
+      through: "member",
+      foreignKey: {
+        name: "userId",
+        field: "user_id"
+      }
+    });
+    // N:M
+    User.belongsToMany(models.Channel, {
+      through: "channel_member",
+      foreignKey: {
+        name: "userId",
+        field: "user_id"
+      }
+    });
+  };
+
+  return User;
+};
