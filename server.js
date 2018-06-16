@@ -7,7 +7,7 @@ import { graphqlExpress, graphiqlExpress } from "apollo-server-express";
 import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
 import jwt from "jsonwebtoken";
 import models from "./models";
-import { refreshTokens } from './auth';
+import { refreshTokens } from "./auth";
 
 const SECRET = "aoriestnwyfulqarosv132";
 const SECRET2 = "hnlqukczou3";
@@ -25,7 +25,7 @@ const app = express();
 app.use(cors("*"));
 
 const addUser = async (req, res, next) => {
-  console.log('REQ.HEADERS, in server.js:', req.headers);
+  console.log("REQ.HEADERS, in server.js:", req.headers);
   const token = req.headers["x-token"];
   if (token) {
     try {
