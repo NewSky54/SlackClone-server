@@ -5,6 +5,19 @@ export default {
   Query: {
     allTeams: requiresAuth.createResolver(async (parent, args, { models, user }) =>
       models.Team.findAll({ where: { owner: user.id } }, { raw: true })
+    ),
+    inviteTeams: requiresAuth.createResolver(async (parent, args, { models, user }) =>
+      models.Team.findAll(
+        {
+          include: [
+            {
+              model: models.User,
+              where: { id: user.id }
+            }
+          ]
+        },
+        { raw: true }
+      )
     )
   },
   Mutation: {
@@ -13,16 +26,19 @@ export default {
       // args: The arguments provided to the field in the GraphQL query.
       // context: A value which is provided to every resolver and holds important contextual information like the currently logged in user, or access to a DB.
       try {
-        const team = await models.Team.create({ ...args, owner: user.id });
-        await models.Channel.create({ name: "general", public: true, teamId: team.id });
+        const response = await models.sequelize.transaction(async () => {
+          const team = await models.Team.create({ ...args, owner: user.id });
+          await models.Channel.create({ name: "general", public: true, teamId: team.id });
+          return team;
+        });
         return {
           ok: true,
-          team
+          team: response
         };
       } catch (err) {
         return {
           ok: false,
-          errors: formatErrors(err)
+          errors: formatErrors(err, models)
         };
       }
     }),
@@ -51,7 +67,7 @@ export default {
         } catch (err) {
           return {
             ok: false,
-            errors: formatErrors(err)
+            errors: formatErrors(err, models)
           };
         }
       }
