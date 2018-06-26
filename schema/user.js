@@ -12,7 +12,7 @@ export default `
     allUsers: [User!]!
   }
 
-  type RegisterResponse {
+  type RegisterResponse{
     ok: Boolean!
     user: User
     errors: [Error!]
@@ -30,4 +30,4 @@ export default `
     login(email: String!, password: String!): LoginResponse!
   }
 
-`;
+`; 

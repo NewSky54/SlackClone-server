@@ -25,7 +25,6 @@ const app = express();
 app.use(cors("*"));
 
 const addUser = async (req, res, next) => {
-  console.log("REQ.HEADERS, in server.js:", req.headers);
   const token = req.headers["x-token"];
   if (token) {
     try {
