@@ -3,7 +3,7 @@ export default `
   type Team {
     id: Int!
     name: String!
-    owner: User!
+    owner: Int!
     members: [User!]!
     channels: [Channel!]!
   }
@@ -11,7 +11,7 @@ export default `
   type CreateTeamResponse {
     ok: Boolean!
     team: Team
-    errors: [Error]
+    errors: [Error!]
   }
 
   type Query {
