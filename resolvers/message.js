@@ -1,6 +1,9 @@
 import formatErrors from "./../formatErrors";
 
 export default {
+  Query: {
+    messages: async (parent, args, { models, user }) => []
+  },
   Mutation: {
     createMessage: async (parent, args, { models, user }) => {
       try {
