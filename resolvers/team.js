@@ -19,6 +19,7 @@ export default {
       // args: The arguments provided to the field in the GraphQL query.
       // context: A value which is provided to every resolver and holds important contextual information like the currently logged in user, or access to a DB.
       try {
+        // If either team or channel throws an error the transaction won't be compeleted and it'll throw an error. 
         const response = await models.sequelize.transaction(async () => {
           const team = await models.Team.create({ ...args, owner: user.id });
           await models.Channel.create({ name: "general", public: true, teamId: team.id });
@@ -38,8 +39,8 @@ export default {
     addTeamMember: requiresAuth.createResolver(
       async (parent, { email, teamId }, { models, user }) => {
         try {
-          const teamPromise = models.Team.findOne({ where: { id: user.id } }, { raw: true });
-          const userToAddPromise = await models.User.findOne({ where: { email } }, { raw: true });
+          const teamPromise = models.Team.findOne({ where: { id: teamId } }, { raw: true });
+          const userToAddPromise =  models.User.findOne({ where: { email } }, { raw: true });
           const [team, userToAdd] = await Promise.all([teamPromise, userToAddPromise]);
           if (team.owner !== user.id) {
             return {

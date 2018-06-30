@@ -68,6 +68,7 @@ models.sequelize.sync({}).then(() => {
   app.listen(8081);
 });
 
-// models.sequelize.sync({ force: true }).then(() => { // Drops database
+// Drops database
+// models.sequelize.sync({ force: true }).then(() => { 
 //   app.listen(8081);
 // });
