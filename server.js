@@ -8,6 +8,9 @@ import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
 import jwt from "jsonwebtoken";
 import models from "./models";
 import { refreshTokens } from "./auth";
+import { createServer } from "http";
+import { execute, subscribe } from "graphql";
+import { SubscriptionServer } from "subscriptions-transport-ws";
 
 const SECRET = "aoriestnwyfulqarosv132";
 const SECRET2 = "hnlqukczou3";
@@ -64,11 +67,25 @@ app.use(
 
 app.use("/graphiql", graphiqlExpress({ endpointURL: graphqlEndpoint }));
 
-models.sequelize.sync({}).then(() => {
-  app.listen(8081);
+const server = createServer(app);
+
+models.sequelize.sync({ }).then(() => {
+  server.listen(8081, () => {
+    new SubscriptionServer(
+      {
+        execute,
+        subscribe,
+        schema
+      },
+      {
+        server: server,
+        path: "/subscriptions"
+      }
+    );
+  });
 });
 
 // Drops database
-// models.sequelize.sync({ force: true }).then(() => { 
+// models.sequelize.sync({ force: true }).then(() => {
 //   app.listen(8081);
 // });
